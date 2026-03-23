@@ -29,7 +29,8 @@ class DataAnalysisUI(tb.Frame):
         # CASSETTA REMARK IN BASSO
         # =======================
         remark_text = (
-            "Driver / National Instruments: selezionare il CSV\n"
+            "Copley (selezionare csv): è possibile mettere Time come asse X, ma preferibile Samples\n"
+            "National Instruments (selezionare csv): selezionare samples come asse X \n"
             "MAGTROL TS grande: plottare su asse X i samples e Y la Torque 1\n"
             "MAGTROL TS piccolo: plottare su asse X i samples e Y la seconda opzione mostrata (Torque Nm)"
         )
