@@ -53,41 +53,56 @@ class DataAnalysisUI(tb.Frame):
         for widget in self.frame_controls.winfo_children():
             widget.destroy()
 
-        # Selezione Y
-        tb.Label(self.frame_controls, text="Colonna Y").grid(row=0, column=0, sticky=W, pady=5)
-        self.y_combo = tb.Combobox(self.frame_controls, values=list(self.df.columns), width=30)
+        cols = list(self.df.columns)
+
+        # Selezione Y1 (Principale - Blu)
+        tb.Label(self.frame_controls, text="Colonna Y1 (Blu)").grid(row=0, column=0, sticky=W, pady=5)
+        self.y_combo = tb.Combobox(self.frame_controls, values=cols, width=30)
         self.y_combo.grid(row=0, column=1, pady=5)
 
+        # Selezione Y2 (Secondaria - Rosso) - OPZIONALE
+        tb.Label(self.frame_controls, text="Colonna Y2 (Rosso)").grid(row=1, column=0, sticky=W, pady=5)
+        self.y2_combo = tb.Combobox(self.frame_controls, values=["None"] + cols, width=30)
+        self.y2_combo.current(0) # Default su None
+        self.y2_combo.grid(row=1, column=1, pady=5)
+
         # Selezione X
-        tb.Label(self.frame_controls, text="Colonna X").grid(row=1, column=0, sticky=W, pady=5)
-        self.x_combo = tb.Combobox(self.frame_controls, values=["Sample"] + list(self.df.columns), width=30)
-        self.x_combo.grid(row=1, column=1, pady=5)
+        tb.Label(self.frame_controls, text="Colonna X").grid(row=2, column=0, sticky=W, pady=5)
+        self.x_combo = tb.Combobox(self.frame_controls, values=["Sample"] + cols, width=30)
+        self.x_combo.grid(row=2, column=1, pady=5)
 
-        # Titolo grafico
-        tb.Label(self.frame_controls, text="Titolo grafico").grid(row=2, column=0, sticky=W, pady=5)
+        # Campi Entry (Titolo, Label)
+        tb.Label(self.frame_controls, text="Titolo grafico").grid(row=3, column=0, sticky=W, pady=5)
         self.title_entry = tb.Entry(self.frame_controls, width=32)
-        self.title_entry.grid(row=2, column=1, pady=5)
+        self.title_entry.grid(row=3, column=1, pady=5)
 
-        # Label asse X
-        tb.Label(self.frame_controls, text="Asse X").grid(row=3, column=0, sticky=W, pady=5)
+        tb.Label(self.frame_controls, text="Asse X").grid(row=4, column=0, sticky=W, pady=5)
         self.xlabel_entry = tb.Entry(self.frame_controls, width=32)
-        self.xlabel_entry.grid(row=3, column=1, pady=5)
+        self.xlabel_entry.grid(row=4, column=1, pady=5)
 
-        # Label asse Y
-        tb.Label(self.frame_controls, text="Asse Y").grid(row=4, column=0, sticky=W, pady=5)
+        tb.Label(self.frame_controls, text="Asse Y1").grid(row=5, column=0, sticky=W, pady=5)
         self.ylabel_entry = tb.Entry(self.frame_controls, width=32)
-        self.ylabel_entry.grid(row=4, column=1, pady=5)
+        self.ylabel_entry.grid(row=5, column=1, pady=5)
 
         # Bottone Plot
-        tb.Button(self.frame_controls, text="Plot", bootstyle="success", command=self.plot_data).grid(
-            row=5, column=0, columnspan=2, pady=15
+        tb.Button(self.frame_controls, text="Genera Grafico", bootstyle="success", command=self.plot_data).grid(
+            row=6, column=0, columnspan=2, pady=15
         )
 
     def plot_data(self):
         y_col = self.y_combo.get()
+        y2_col = self.y2_combo.get()
         x_col = self.x_combo.get()
+        
+        # Gestione asse X
         if x_col == "Sample":
             x_col = None
+        
+        # Gestione asse Y2: se è "None" o vuoto, passiamo None reale
+        if y2_col == "None" or not y2_col.strip():
+            y2_col_to_send = None
+        else:
+            y2_col_to_send = y2_col
 
         # Legge valori dai campi entry
         title = self.title_entry.get().strip()
@@ -99,10 +114,12 @@ class DataAnalysisUI(tb.Frame):
         xlabel = xlabel if xlabel else (x_col or "Sample")
         ylabel = ylabel if ylabel else y_col
 
+        # Chiamata alla logica
         self.analyzer.plot_with_cursors(
             self.df,
             x_col,
             y_col,
+            y_col2=y2_col_to_send,
             title=title,
             xlabel=xlabel,
             ylabel=ylabel
